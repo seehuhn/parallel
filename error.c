@@ -1,4 +1,4 @@
-/* error.c - handle jvterm error messages
+/* error.c - handle parallel's error messages
  *
  * Copyright (C) 2001, 2003  Jochen Voss.
  *
