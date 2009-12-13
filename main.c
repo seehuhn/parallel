@@ -1,6 +1,19 @@
-/* main.c -
+/* main.c - main file for parallel
  *
  * Copyright (C) 2009  Jochen Voss.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -12,6 +25,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <sys/resource.h>
 #include <assert.h>
 #include <errno.h>
 
@@ -110,6 +124,8 @@ the file named COPYING.");
   if (verbose_flag)
     message("running up to %ld processes in parallel", n_max);
 
+  if (! cf_name)
+    message("reading commands from stdin");
   cf = new_cf(cf_name);
   if (! cf)
     fatal("error: cannot open command file \"%s\"", cf_name);
@@ -129,6 +145,8 @@ the file named COPYING.");
       } else if (pid == 0) {
 	/* child process */
 
+	setpriority(PRIO_PROCESS, 0, PRIO_MAX);
+
 	execl("/bin/sh", "sh", "-c", cmd, NULL);
 	/* only returns in case of error */
 	fprintf(stderr, "error: failed to execute child process (%m)\n");
@@ -136,7 +154,7 @@ the file named COPYING.");
       } else {
 	/* parent process */
 	++n_running;
-	message("cmd %ld: %s (pid %d)", cmd_no, cmd, pid);
+	message("%ld: %s (pid %d)", cmd_no, cmd, pid);
       }
     }
     if (n_running == 0)

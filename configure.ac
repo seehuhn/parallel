@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(parallel, 0.1, voss@seehuhn.de)
+AC_INIT(parallel, 0.9, voss@seehuhn.de)
 AC_CONFIG_SRCDIR([parallel.h])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
