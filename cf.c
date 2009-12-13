@@ -98,6 +98,7 @@ cf_extend(struct cf *cf)
       cf->buffer = xrenew(char, cf->buffer, cf->allocated);
     }
 
+    clearerr(cf->fd);
     rc = fread(cf->buffer + cf->used, 1, cf->allocated - cf->used, cf->fd);
 
     if (rc > 0) {

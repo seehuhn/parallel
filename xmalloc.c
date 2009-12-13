@@ -28,45 +28,51 @@
 
 
 void *
-xmalloc (size_t size)
+xmalloc(size_t size)
 /* Like 'malloc', but check for shortage of memory.  For positive
  * sizes 'xmalloc' never returns 'NULL'.  */
 {
   void *ptr;
 
-  if (size == 0)  return NULL;
-  ptr = malloc (size);
-  if (ptr == NULL)  fatal ("memory exhausted");
+  if (size == 0)
+    return NULL;
+  ptr = malloc(size);
+  if (ptr == NULL)
+    fatal("memory exhausted");
   return  ptr;
 }
 
 void *
-xrealloc (void *ptr, size_t newsize)
+xrealloc(void *ptr, size_t newsize)
 /* Like 'realloc', but check for shortage of memory.  For positive
  * sizes 'xrealloc' never returns 'NULL'.  */
 {
   if (newsize == 0) {
-    if (ptr)  free (ptr);
+    if (ptr)
+      free(ptr);
     return NULL;
   }
-  ptr = ptr ? realloc (ptr, newsize) : malloc(newsize);
-  if (ptr == NULL)  fatal ("memory exhausted");
+  ptr = ptr ? realloc(ptr, newsize) : malloc(newsize);
+  if (ptr == NULL)
+    fatal("memory exhausted");
   return  ptr;
 }
 
 void
-xfree (void *ptr)
+xfree(void *ptr)
 /* Like 'free', but ignores NULL pointers.  */
 {
-  if (ptr)  free (ptr);
+  if (ptr)
+    free(ptr);
 }
 
 char *
-xstrdup (const char *s)
+xstrdup(const char *s)
 {
   char *ptr;
 
-  ptr = strdup (s);
-  if (ptr == NULL)  fatal ("memory exhausted");
+  ptr = strdup(s);
+  if (ptr == NULL)
+    fatal("memory exhausted");
   return  ptr;
 }

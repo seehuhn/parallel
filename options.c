@@ -34,36 +34,36 @@ static int  p_allocated;
 
 
 static void
-remove_arg (int idx)
+remove_arg(int idx)
 {
-  assert (idx>0 && idx<xargc);
+  assert(idx>0 && idx<xargc);
 
   --xargc;
-  memmove (xargv+idx, xargv+idx+1, (xargc-idx)*sizeof(char *));
+  memmove(xargv+idx, xargv+idx+1, (xargc-idx)*sizeof(char *));
 }
 
 static void
-insert_args (int idx, int n)
+insert_args(int idx, int n)
 {
-  assert (idx>0 && idx<=xargc);
+  assert(idx>0 && idx<=xargc);
 
   if (xargc+n > xargv_len) {
     xargv_len = xargc+n;
-    xargv = xrenew (char *, xargv, xargv_len);
+    xargv = xrenew(char *, xargv, xargv_len);
   }
-  memmove (xargv+idx+n, xargv+idx, (xargc-idx)*sizeof(char *));
+  memmove(xargv+idx+n, xargv+idx, (xargc-idx)*sizeof(char *));
   xargc += n;
 }
 
 static void *
-vmalloc (size_t size)
+vmalloc(size_t size)
 {
-  pointers = xrenew (void *, pointers, p_allocated+1);
-  return  pointers[p_allocated++] = xmalloc (size);
+  pointers = xrenew(void *, pointers, p_allocated+1);
+  return  pointers[p_allocated++] = xmalloc(size);
 }
 
 static int
-check_long_opt (const struct voption *options, const char *str)
+check_long_opt(const struct voption *options, const char *str)
 {
   int  j;
 
@@ -78,7 +78,7 @@ check_long_opt (const struct voption *options, const char *str)
 }
 
 static int
-check_short_opt (const struct voption *options, const char *str)
+check_short_opt(const struct voption *options, const char *str)
 {
   int  j;
 
@@ -92,25 +92,25 @@ check_short_opt (const struct voption *options, const char *str)
 }
 
 static const char *
-get_long_argument (int i)
+get_long_argument(int i)
 {
-  const char *ptr = strchr (xargv[i], '=');
+  const char *ptr = strchr(xargv[i], '=');
 
   if (ptr != NULL) {
     ++ptr;
   } else {
     if (i+1 >= xargc) {
-      error ("long option \"%s\" lacks an argument", xargv[i]);
+      error("long option \"%s\" lacks an argument", xargv[i]);
       return  NULL;
     }
     ptr = xargv[i+1];
-    remove_arg (i+1);
+    remove_arg(i+1);
   }
   return  ptr;
 }
 
 static const char *
-get_short_argument (int i)
+get_short_argument(int i)
 {
   const char *ptr = xargv[i];
 
@@ -118,17 +118,17 @@ get_short_argument (int i)
     ptr += 2;
   } else {
     if (i+1 >= xargc) {
-      error ("option \"%s\" lacks an argument", xargv[i]);
+      error("option \"%s\" lacks an argument", xargv[i]);
       return  NULL;
     }
     ptr = xargv[i+1];
-    remove_arg (i+1);
+    remove_arg(i+1);
   }
   return  ptr;
 }
 
 static int
-split_test (const struct voption *options, char c)
+split_test(const struct voption *options, char c)
 {
   int  j;
 
@@ -139,18 +139,18 @@ split_test (const struct voption *options, char c)
 }
 
 static void
-split_option (int i)
+split_option(int i)
 {
   char *str = xargv[i];
-  insert_args (i+1, 1);
-  xargv[i] = vmalloc (3);
+  insert_args(i+1, 1);
+  xargv[i] = vmalloc(3);
   xargv[i][0] = '-';
   xargv[i][1] = str[1];
   xargv[i][2] = '\0';
 
-  xargv[i+1] = vmalloc (strlen(str));
+  xargv[i+1] = vmalloc(strlen(str));
   xargv[i+1][0] = '-';
-  strcpy (xargv[i+1]+1, str+2);
+  strcpy(xargv[i+1]+1, str+2);
 }
 
 /**********************************************************************
@@ -158,27 +158,34 @@ split_option (int i)
  */
 
 void
-open_options (int argc, char **argv)
+open_options(int argc, char **argv)
 {
   xargc = argc;
-  xargv = xnew (char *, argc);
-  memcpy (xargv, argv, xargc*sizeof (char *));
+  xargv = xnew(char *, argc);
+  memcpy(xargv, argv, xargc*sizeof(char *));
 }
 
 void
-close_options (void)
+close_options(void)
 {
   int  i;
 
-  for (i=0; i<p_allocated; ++i)  xfree (pointers[i]);
-  xfree (pointers);
-  xfree (xargv);
+  for (i=0; i<p_allocated; ++i)  xfree(pointers[i]);
+  xfree(pointers);
+  xfree(xargv);
+}
+
+void
+options_args(int *argc_p, char ***argv_p)
+{
+  *argc_p = xargc;
+  *argv_p = xargv;
 }
 
 int
-options_get (const struct voption *options,
-	     const char **argptr,
-	     int flags)
+options_get(const struct voption *options,
+	    const char **argptr,
+	    int flags)
 /* Parse 'xargv' to get the next option.  Return the short option
  * letter, if one option is recognised and cannot be handled
  * internally.  Return -1 on end of options.  If an option lacks an
@@ -196,37 +203,37 @@ options_get (const struct voption *options,
   while (i<xargc) {
     const char *str = xargv[i];
 
-    if (str[0] != '-' || strcmp (str, "-") == 0) {
+    if (str[0] != '-' || strcmp(str, "-") == 0) {
       if (flags & V_MIXED) {
 	++i;
 	continue;
       }
       break;
     }
-    if (strcmp (str, "--") == 0) {
-      remove_arg (i);
+    if (strcmp(str, "--") == 0) {
+      remove_arg(i);
       break;
     }
 
     j = -1;
     if (str[1] == '-') {
-      j = check_long_opt (options, str+2);
-      if (j >= 0 && options[j].has_arg)  *argptr = get_long_argument (i);
+      j = check_long_opt(options, str+2);
+      if (j >= 0 && options[j].has_arg)  *argptr = get_long_argument(i);
     } else if (flags & V_ONE_HYPHEN) {
-      j = check_long_opt (options, str+1);
-      if (j >= 0 && options[j].has_arg)  *argptr = get_long_argument (i);
+      j = check_long_opt(options, str+1);
+      if (j >= 0 && options[j].has_arg)  *argptr = get_long_argument(i);
     }
     if (j < 0) {
-      j = check_short_opt (options, str+1);
-      if (j >= 0 && options[j].has_arg)  *argptr = get_short_argument (i);
+      j = check_short_opt(options, str+1);
+      if (j >= 0 && options[j].has_arg)  *argptr = get_short_argument(i);
     }
 
     if (j < 0) {
       if (str[1] != '-'
 	  && str[2] != '\0'
 	  && ! (flags & V_NO_JOIN)
-	  && (! V_ONE_HYPHEN || split_test (options, str[1])) ) {
-	split_option (i);
+	  && (! V_ONE_HYPHEN || split_test(options, str[1])) ) {
+	split_option(i);
 	continue;
       }
       if (flags & V_KEEP_UNKNOWN) {
@@ -234,11 +241,11 @@ options_get (const struct voption *options,
 	continue;
       } else {
 	*argptr = str;
-	remove_arg (i);
+	remove_arg(i);
 	return  0;
       }
     } else {
-      remove_arg (i);
+      remove_arg(i);
       if (options[j].flag_ptr) {
 	*(options[j].flag_ptr) = 1;
 	if (! options[j].has_arg)  continue;
@@ -252,21 +259,21 @@ options_get (const struct voption *options,
 }
 
 void
-options_show (const struct voption *options)
+options_show(const struct voption *options)
 /* Emit a list of options to stderr for use in the help text.  */
 {
   int  i;
 
-  fputs ("The following options are available:\n", stderr);
+  fputs("The following options are available:\n", stderr);
   for (i=0; options[i].name != NULL; ++i) {
     if (options[i].has_arg) {
       char  buffer [80];
-      sprintf (buffer, "%s=%s", options[i].name, options[i].arg_name);
-      fprintf (stderr, "  -%c, --%-16s %s\n",
-	       options[i].short_name, buffer, options[i].help);
+      sprintf(buffer, "%s=%s", options[i].name, options[i].arg_name);
+      fprintf(stderr, "  -%c, --%-16s %s\n",
+	      options[i].short_name, buffer, options[i].help);
     } else {
-      fprintf (stderr, "  -%c, --%-16s %s\n",
-	       options[i].short_name, options[i].name, options[i].help);
+      fprintf(stderr, "  -%c, --%-16s %s\n",
+	      options[i].short_name, options[i].name, options[i].help);
     }
   }
 }

@@ -24,77 +24,83 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <sys/time.h>
+#include <time.h>
 #include <ctype.h>
 
 #include "parallel.h"
 
 
 void
-fatal (const char *format, ...)
+fatal(const char *format, ...)
 /* Signal a fatal error and quit immediately.
  * 'format' should be a printf format string, starting with a
- * lower-case letter.  Both, the format and the arguments should be
- * encoded using the 'parent_CHARSET'.  */
+ * lower-case letter.  */
 {
   va_list  ap;
   char *msg;
 
-  va_start (ap, format);
-  vasprintf (&msg, format, ap);
-  va_end (ap);
-  log_write_line (log_ERROR, msg);
-  free (msg);
+  va_start(ap, format);
+  vasprintf(&msg, format, ap);
+  va_end(ap);
+  log_write_line(log_ERROR, msg);
+  free(msg);
 
   exit(1);
 }
 
 void
-error (const char *format, ...)
+error(const char *format, ...)
 /* Emit an error message and continue without further consequence.
  * 'format' should be a printf format string, starting with a
- * lower-case letter.  Both, the format and the arguments should be
- * encoded using the 'parent_CHARSET'.  */
+ * lower-case letter.  */
 {
   va_list  ap;
   char *msg;
 
-  va_start (ap, format);
-  vasprintf (&msg, format, ap);
-  va_end (ap);
-  log_write_line (log_ERROR, msg);
-  free (msg);
+  va_start(ap, format);
+  vasprintf(&msg, format, ap);
+  va_end(ap);
+  log_write_line(log_ERROR, msg);
+  free(msg);
 }
 
 void
-warning (const char *format, ...)
+warning(const char *format, ...)
 /* Emit a warning and continue without further consequence.
  * 'format' should be a printf format string, starting with a
- * lower-case letter.  Both, the format and the arguments should be
- * encoded using the 'parent_CHARSET'.  */
+ * lower-case letter.  */
 {
   va_list  ap;
   char *msg;
 
-  va_start (ap, format);
-  vasprintf (&msg, format, ap);
-  va_end (ap);
-  log_write_line (log_WARNING, msg);
-  free (msg);
+  va_start(ap, format);
+  vasprintf(&msg, format, ap);
+  va_end(ap);
+  log_write_line(log_WARNING, msg);
+  free(msg);
 }
 
 void
-message (const char *format, ...)
+message(const char *format, ...)
 /* Emit a message and continue without further consequence.
  * 'format' should be a printf format string, starting with a
- * lower-case letter.  Both, the format and the arguments should be
- * encoded using the 'parent_CHARSET'.  */
+ * lower-case letter.  */
 {
   va_list  ap;
-  char *msg;
+  time_t t;
+  char buf[32];
+  char *m1, *m2;
 
-  va_start (ap, format);
-  vasprintf (&msg, format, ap);
-  va_end (ap);
-  log_write_line (log_MESSAGE, msg);
-  free (msg);
+  va_start(ap, format);
+  vasprintf(&m1, format, ap);
+  va_end(ap);
+
+  t = time(NULL);
+  strftime(buf, 32, "%Y-%m-%d %H:%M:%S", localtime(&t));
+  asprintf(&m2, "%s: %s", buf, m1);
+
+  log_write_line(log_MESSAGE, m2);
+  free(m2);
+  free(m1);
 }

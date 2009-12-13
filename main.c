@@ -10,6 +10,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <assert.h>
 #include <errno.h>
 
 #include "parallel.h"
@@ -24,7 +27,7 @@ main(int argc, char **argv)
 {
   int  error_flag = 0;
   int  help_flag = 0;
-  long  nprocs = 0;
+  long  n_max = 0;
   char *cf_name = NULL;
   int  verbose_flag = 0;
   int  version_flag = 0;
@@ -42,7 +45,9 @@ main(int argc, char **argv)
       "show version information" },
     { NULL, '\0', NULL, 0, NULL, NULL }
   };
+
   struct cf *cf;
+  long  n_running, cmd_no;
 
   open_options(argc, argv);
   do {
@@ -54,8 +59,8 @@ main(int argc, char **argv)
       {
 	char *tail;
 	errno = 0;
-	nprocs = strtol(optarg, &tail, 0);
-	if (tail==optarg || *tail!=0 || errno || nprocs<1) {
+	n_max = strtol(optarg, &tail, 0);
+	if (tail==optarg || *tail!=0 || errno || n_max<1) {
 	  error("error: invalid number of parallel processes \"%s\"", optarg);
 	  error_flag = 1;
 	}
@@ -73,6 +78,10 @@ main(int argc, char **argv)
       fatal("error: internal error while parsing options");
     }
   } while (! error_flag);
+
+  options_args(&argc, &argv);
+  if (argc > 1)
+    error("error: extra command line arguments");
 
   if (version_flag) {
     puts("parallel " VERSION);
@@ -95,19 +104,66 @@ the file named COPYING.");
   }
   close_options();
 
-  if (nprocs == 0) {
-    nprocs = sysconf(_SC_NPROCESSORS_CONF);
+  if (n_max == 0) {
+    n_max = sysconf(_SC_NPROCESSORS_CONF);
   }
-  printf("** %ld parallel processes\n", nprocs);
+  if (verbose_flag)
+    message("running up to %ld processes in parallel", n_max);
 
   cf = new_cf(cf_name);
   if (! cf)
     fatal("error: cannot open command file \"%s\"", cf_name);
 
-  int i;
-  for (i=0; i<5; ++i) {
-    puts(cf_next(cf));
+  cmd_no = 0;
+  n_running = 0;
+  for (;;) {
+    const char *cmd;
+    pid_t pid;
+
+    while ((n_running < n_max) && (cmd = cf_next(cf))) {
+      ++cmd_no;
+
+      pid = fork();
+      if (pid == -1) {
+	error("error: fork failed (%m)");
+      } else if (pid == 0) {
+	/* child process */
+
+	execl("/bin/sh", "sh", "-c", cmd, NULL);
+	/* only returns in case of error */
+	fprintf(stderr, "error: failed to execute child process (%m)\n");
+	_exit(1);
+      } else {
+	/* parent process */
+	++n_running;
+	message("cmd %ld: %s (pid %d)", cmd_no, cmd, pid);
+      }
+    }
+    if (n_running == 0)
+      break;
+
+    {
+      int status;
+
+      pid = wait(&status);
+      if (WIFEXITED(status)) {
+	int rc = WEXITSTATUS(status);
+	if (rc) {
+	  message("pid %d exited with status %d", pid, rc);
+	} else if (verbose_flag) {
+	  message("pid %d completed", pid);
+	}
+      } else if (WIFSIGNALED(status)) {
+	message("pid %d terminated by signal %d", pid, WTERMSIG(status));
+      } else {
+	message("pid %d miraculously died", pid);
+      }
+      --n_running;
+    }
   }
+
+  if (verbose_flag)
+    message("%ld jobs completed", cmd_no);
 
   if (cf_is_incomplete(cf)) {
     error("error: incomplete line at the end of command file (ignored)");

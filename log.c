@@ -50,9 +50,9 @@ struct logdomain {
 static struct logdomain *log;
 
 void
-open_log (void)
+open_log(void)
 {
-  log = xnew (struct logdomain, 1);
+  log = xnew(struct logdomain, 1);
   log->clients = NULL;
   log->backlog = NULL;
   log->backlog_flag = 1;
@@ -60,50 +60,50 @@ open_log (void)
 }
 
 static void
-clear_backlog (void)
+clear_backlog(void)
 {
   struct logline *bptr;
 
   bptr = log->backlog;
   while (bptr) {
     struct logline *btmp = bptr->next;
-    xfree (bptr->message);
-    xfree (bptr);
+    xfree(bptr->message);
+    xfree(bptr);
     bptr = btmp;
   }
   log->backlog = NULL;
 }
 
 void
-close_log (void)
+close_log(void)
 {
   struct logclient *cptr;
 
   cptr = log->clients;
   while (cptr) {
     struct logclient *ctmp = cptr->next;
-    xfree (cptr);
+    xfree(cptr);
     cptr = ctmp;
   }
-  clear_backlog ();
-  xfree (log);
+  clear_backlog();
+  xfree(log);
   log = NULL;
 }
 
 void
-log_up_and_running (void)
+log_up_and_running(void)
 {
   log->backlog_flag = 0;
-  clear_backlog ();
+  clear_backlog();
 }
 
 int
-log_add_client (write_line_fn write_line, void *client_data)
+log_add_client(write_line_fn write_line, void *client_data)
 {
   struct logclient *client;
   struct logline *bptr;
 
-  client = xnew (struct logclient, 1);
+  client = xnew(struct logclient, 1);
   client->next = log->clients;
   client->write_line = write_line;
   client->client_data = client_data;
@@ -113,7 +113,7 @@ log_add_client (write_line_fn write_line, void *client_data)
 
   bptr = log->backlog;
   while (bptr) {
-    write_line (bptr->level, bptr->message, client_data);
+    write_line(bptr->level, bptr->message, client_data);
     bptr = bptr->next;
   }
 
@@ -121,7 +121,7 @@ log_add_client (write_line_fn write_line, void *client_data)
 }
 
 void
-log_remove_client (int handle)
+log_remove_client(int handle)
 {
   struct logclient **cpptr = &(log->clients);
   while (*cpptr) {
@@ -129,7 +129,7 @@ log_remove_client (int handle)
       struct logclient *ctmp;
       ctmp = *cpptr;
       *cpptr = (*cpptr)->next;
-      xfree (ctmp);
+      xfree(ctmp);
       return;
     }
     cpptr = &((*cpptr)->next);
@@ -137,14 +137,14 @@ log_remove_client (int handle)
 }
 
 void
-log_write_line (enum loglevel level, const char *message)
+log_write_line(enum loglevel level, const char *message)
 /* Write out the UTF-8 encoded MESSAGE to all clients.  */
 {
   struct logclient *cptr;
 
   if (! log) {			/* emergency logging */
-    fputs (message, stderr);
-    fputc ('\n', stderr);
+    fputs(message, stderr);
+    fputc('\n', stderr);
     return;
   }
 
@@ -152,10 +152,10 @@ log_write_line (enum loglevel level, const char *message)
     struct logline *line;
     struct logline **lpptr = &(log->backlog);
 
-    line = xnew (struct logline, 1);
+    line = xnew(struct logline, 1);
     line->next = NULL;
     line->level = level;
-    line->message = xstrdup (message);
+    line->message = xstrdup(message);
 
     while (*lpptr)  lpptr = &((*lpptr)->next);
     *lpptr = line;
@@ -163,7 +163,7 @@ log_write_line (enum loglevel level, const char *message)
 
   cptr = log->clients;
   while (cptr) {
-    cptr->write_line (level, message, cptr->client_data);
+    cptr->write_line(level, message, cptr->client_data);
     cptr = cptr->next;
   }
 }

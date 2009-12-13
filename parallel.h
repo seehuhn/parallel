@@ -86,6 +86,7 @@ struct voption {
 
 extern  void  open_options(int argc, char **argv);
 extern  void  close_options(void);
+extern  void  options_args(int *argc_p, char ***argv_p);
 extern  int  options_get(const struct voption *options,
 			 const char **argptr, int flags);
 extern  void  options_show(const struct voption *options);
