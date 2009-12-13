@@ -45,7 +45,7 @@ fatal (const char *format, ...)
   log_write_line (log_ERROR, msg);
   free (msg);
 
-  abort ();
+  exit(1);
 }
 
 void

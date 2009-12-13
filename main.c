@@ -15,12 +15,17 @@
 #include "parallel.h"
 
 
+/**********************************************************************
+ * main program
+ */
+
 int
 main(int argc, char **argv)
 {
   int  error_flag = 0;
   int  help_flag = 0;
   long  nprocs = 0;
+  char *cf_name = NULL;
   int  verbose_flag = 0;
   int  version_flag = 0;
   const char *optarg;
@@ -29,12 +34,15 @@ main(int argc, char **argv)
       "show this message" },
     { "nprocs", 'n', NULL, 1, "N",
       "maxmimal number of parallel processes" },
+    { "commands", 'c', NULL, 1, "FNAME",
+      "read commands from FNAME instead of from stdin" },
     { "verbose", 'v', &verbose_flag, 0, NULL,
       "emit messages to stdout" },
     { "version", 'V', &version_flag, 0, NULL,
       "show version information" },
     { NULL, '\0', NULL, 0, NULL, NULL }
   };
+  struct cf *cf;
 
   open_options(argc, argv);
   do {
@@ -48,18 +56,21 @@ main(int argc, char **argv)
 	errno = 0;
 	nprocs = strtol(optarg, &tail, 0);
 	if (tail==optarg || *tail!=0 || errno || nprocs<1) {
-	  error("invalid number of parallel processes \"%s\"", optarg);
+	  error("error: invalid number of parallel processes \"%s\"", optarg);
 	  error_flag = 1;
 	}
       }
       break;
+    case 'c':
+      cf_name = xstrdup(optarg);
+      break;
     case '\0':
       if (optarg)
-	error("unknown option \"%s\"", optarg);
+	error("error: unknown option \"%s\"", optarg);
       error_flag = 1;
       break;
     default:
-      fatal("internal error while parsing options");
+      fatal("error: internal error while parsing options");
     }
   } while (! error_flag);
 
@@ -87,7 +98,22 @@ the file named COPYING.");
   if (nprocs == 0) {
     nprocs = sysconf(_SC_NPROCESSORS_CONF);
   }
-  printf("%ld parallel processes\n", nprocs);
+  printf("** %ld parallel processes\n", nprocs);
 
+  cf = new_cf(cf_name);
+  if (! cf)
+    fatal("error: cannot open command file \"%s\"", cf_name);
+
+  int i;
+  for (i=0; i<5; ++i) {
+    puts(cf_next(cf));
+  }
+
+  if (cf_is_incomplete(cf)) {
+    error("error: incomplete line at the end of command file (ignored)");
+  }
+
+  delete_cf(cf);
+  xfree(cf_name);
   return 0;
 }
