@@ -1,0 +1,38 @@
+commit 48a94763890dd7899f93f6ee6db6b3b2f539b1b7
+Author: Jochen Voss <voss@seehuhn.de>
+Date:   Sun Dec 13 17:45:58 2009 +0000
+
+    Complete the first working version of the program.
+    
+    This commit introduces the ability to spawn sub-processes
+    and includes minor cleanups.
+
+commit f0a80bb0abff1abe6548ac1429d232076a73a75b
+Author: Jochen Voss <voss@seehuhn.de>
+Date:   Sun Dec 13 13:06:56 2009 +0000
+
+    implement reading of the command file
+
+commit 48c644c828a6de121245359e02b32146c7d5e57e
+Author: Jochen Voss <voss@seehuhn.de>
+Date:   Thu Dec 10 22:26:30 2009 +0000
+
+    minor doc fix
+
+commit d16a95e4f91070c9f0295a73b72e5159c2171d47
+Author: Jochen Voss <voss@seehuhn.de>
+Date:   Thu Dec 10 13:48:00 2009 +0000
+
+    include COPYING and remove auto-generated file INSTALL
+
+commit b71447f39bce12ce4625756757b5b9acf241b552
+Author: Jochen Voss <voss@seehuhn.de>
+Date:   Thu Dec 10 13:47:09 2009 +0000
+
+    add an autogen script
+
+commit a4b890fa80e32b6fbf1098fd77216a08b66d4b00
+Author: Jochen Voss <voss@seehuhn.de>
+Date:   Thu Dec 10 13:41:58 2009 +0000
+
+    initial revision

@@ -1,0 +1,63 @@
+.\" parallel.1 - manual page for parallel
+.\" Copyright 2009  Jochen Voss
+.de Op
+.BR \-\\$1  ", " \-\-\\$2
+..
+.TH parallel 1 "Dec 13 2009" "parallel 0.1"
+.SH NAME
+parallel \- utilise multi-processor systems by running programs in parallel
+.SH SYNOPSIS
+parallel [\-cnhvV] [\-\-commands
+.IR fname ]
+[\-\-nprocs
+.IR n ]
+[\-\-help] [\-\-verbose] [\-\-version]
+.SH DESCRIPTION
+.B Parallel
+allows fully utilise a multi-processor system by running several
+programs in parallel.
+.P
+The list of commands to be run is read from
+.I stdin
+or alternatively can be supplied in a file using the
+.I -c
+option.  Each line of the command list is passed to
+.I /bin/sh
+in turn.  The code is executed using the maximal possible nice value,
+.I i.e.
+with a low priority feasible for background batch processing.
+.P
+The number of parallel programs is configurable
+using the
+.I -n
+option, by default the number of cpu cores is used.  As soon as one of
+the programs exits, another one is started, until the queue is
+exhausted.
+.SH OPTIONS
+The program understands the following command line options.
+.TP
+\fB\-c\fIfname\fR, \fB\-\-commands\fR=\fIfname\fR
+gives a file to read commands from (instead of from
+.IR stdin ).
+Each line of the file is interpreted as one command and is
+run via
+.IR /bin/sh .
+.TP
+\fB\-n\fIn\fR, \fB\-\-nprocs\fR=\fIn\fR
+specifies the maximal number of commands to run in parallel.
+Default is the number of CPU core in the system.
+.TP
+.Op h help
+shows a short usage message.
+.TP
+.Op v verbose
+emit slightly more messages.
+.TP
+.Op V version
+write the program\'s version to standard output and exits.
+.SH SEE ALSO
+.BR batch (1),
+.BR nice (1)
+.\" Local Variables:
+.\" mode: nroff
+.\" End:
