@@ -3,4 +3,4 @@
 
 bin_PROGRAMS = parallel
 parallel_SOURCES = main.c cf.c options.c xmalloc.c error.c log.c parallel.h
-man_MANS = parallel.1
+dist_man_MANS = parallel.1

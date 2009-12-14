@@ -1,3 +1,15 @@
+commit 230597eeb40fbd56d53e6e7e516e5622452cb28f
+Author: Jochen Voss <voss@seehuhn.de>
+Date:   Sun Dec 13 20:07:36 2009 +0000
+
+    some more fixes in preparation of a release
+
+commit c180a54ece3c05381fd968912b17203ce593032b
+Author: Jochen Voss <voss@seehuhn.de>
+Date:   Sun Dec 13 19:57:49 2009 +0000
+
+    add some documentation in preparation for a release
+
 commit 48a94763890dd7899f93f6ee6db6b3b2f539b1b7
 Author: Jochen Voss <voss@seehuhn.de>
 Date:   Sun Dec 13 17:45:58 2009 +0000
